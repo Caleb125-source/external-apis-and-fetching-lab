@@ -2,11 +2,6 @@
 //const weatherApi = "https://api.weather.gov/alerts/active?area="//
 
 // Your code here!
-// Get DOM elements
-const stateInput = document.getElementById('state-input');
-const fetchButton = document.getElementById('fetch-alerts');
-const alertsDisplay = document.getElementById('alerts-display');
-const errorMessage = document.getElementById('error-message');
 
 // Step 1: Fetch weather alerts from the National Weather Service API
 async function fetchWeatherAlerts(state) {
@@ -39,6 +34,9 @@ function displayAlerts(data) {
   // Create summary message using title from API
   const summaryMessage = `${title}: ${alertCount}`;
   
+  // Get the alerts display element
+  const alertsDisplay = document.getElementById('alerts-display');
+  
   // Clear previous content
   alertsDisplay.innerHTML = '';
   
@@ -57,7 +55,7 @@ function displayAlerts(data) {
   } else {
     // Create a list for alert headlines
     const alertList = document.createElement('ul');
-    alertList.className = 'alert-list'; // Added class for styling
+    alertList.className = 'alert-list';
     
     // Loop through each alert adding its headline to the list
     alerts.forEach(alert => {
@@ -76,6 +74,7 @@ function displayAlerts(data) {
 
 // Step 4: Display error messages
 function showError(message) {
+  const errorMessage = document.getElementById('error-message');
   errorMessage.textContent = message;
   errorMessage.classList.remove('hidden');
   errorMessage.classList.add('show');
@@ -83,6 +82,7 @@ function showError(message) {
 
 // Hide error messages
 function hideError() {
+  const errorMessage = document.getElementById('error-message');
   errorMessage.textContent = '';
   errorMessage.classList.add('hidden');
   errorMessage.classList.remove('show');
@@ -90,29 +90,16 @@ function hideError() {
 
 // Step 3: Clear and reset the UI
 function clearUI() {
+  const alertsDisplay = document.getElementById('alerts-display');
   alertsDisplay.innerHTML = '';
   hideError();
 }
 
-// Optional: Input validation
-function validateStateInput(state) {
-  if (!state || state.trim() === '') {
-    throw new Error('Please enter a state abbreviation');
-  }
-  
-  if (state.length !== 2) {
-    throw new Error('State abbreviation must be exactly 2 letters');
-  }
-  
-  if (!/^[A-Z]{2}$/i.test(state)) {
-    throw new Error('Please enter only letters');
-  }
-  
-  return state.toUpperCase();
-}
-
 // Main handler function
 async function handleFetchAlerts() {
+  const stateInput = document.getElementById('state-input');
+  const alertsDisplay = document.getElementById('alerts-display');
+  
   try {
     // Get input value
     const state = stateInput.value.trim().toUpperCase();
@@ -139,12 +126,25 @@ async function handleFetchAlerts() {
   }
 }
 
-// Event listener for the fetch button
-fetchButton.addEventListener('click', handleFetchAlerts);
+// Initialize event listeners after DOM is loaded
+function init() {
+  const stateInput = document.getElementById('state-input');
+  const fetchButton = document.getElementById('fetch-alerts');
+  
+  // Event listener for the fetch button
+  fetchButton.addEventListener('click', handleFetchAlerts);
+  
+  // Optional: Allow Enter key to submit
+  stateInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      handleFetchAlerts();
+    }
+  });
+}
 
-// Optional: Allow Enter key to submit
-stateInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') {
-    handleFetchAlerts();
-  }
-});
+// Run init when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
