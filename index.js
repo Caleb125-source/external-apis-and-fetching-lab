@@ -7,21 +7,15 @@
 async function fetchWeatherAlerts(state) {
   const url = `https://api.weather.gov/alerts/active?area=${state}`;
   
-  try {
-    const response = await fetch(url);
-    
-    // Check if the response is successful
-    if (!response.ok) {
-      throw new Error(`Failed to fetch alerts. Status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    console.log('API Response:', data);
-    return data;
-  } catch (error) {
-    console.log('Error:', error.message);
-    throw error;
+  const response = await fetch(url);
+  
+  // Check if the response is successful
+  if (!response.ok) {
+    throw new Error(`Failed to fetch alerts. Status: ${response.status}`);
   }
+  
+  const data = await response.json();
+  return data;
 }
 
 // Step 2: Display the alerts on the page
@@ -121,30 +115,34 @@ async function handleFetchAlerts() {
     
   } catch (error) {
     // Step 4: Handle errors - display error message
+    const alertsDisplay = document.getElementById('alerts-display');
     alertsDisplay.innerHTML = '';
     showError(error.message);
   }
 }
 
-// Initialize event listeners after DOM is loaded
+// Initialize event listeners
 function init() {
   const stateInput = document.getElementById('state-input');
   const fetchButton = document.getElementById('fetch-alerts');
   
-  // Event listener for the fetch button
-  fetchButton.addEventListener('click', handleFetchAlerts);
-  
-  // Optional: Allow Enter key to submit
-  stateInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      handleFetchAlerts();
-    }
-  });
+  if (fetchButton && stateInput) {
+    // Event listener for the fetch button
+    fetchButton.addEventListener('click', handleFetchAlerts);
+    
+    // Optional: Allow Enter key to submit
+    stateInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        handleFetchAlerts();
+      }
+    });
+  }
 }
 
-// Run init when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
+// Set up event listeners when DOM is ready
+document.addEventListener('DOMContentLoaded', init);
+
+// Also run init immediately if DOM is already loaded (for tests)
+if (document.readyState !== 'loading') {
   init();
 }
