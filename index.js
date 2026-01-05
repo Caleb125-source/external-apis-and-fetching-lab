@@ -142,7 +142,7 @@ function init() {
 // Set up event listeners when DOM is ready
 document.addEventListener('DOMContentLoaded', init);
 
-// Also run init immediately if DOM is already loaded (for tests)
+// If the DOM is already loaded, initialize immediately
 if (document.readyState !== 'loading') {
   init();
 }
